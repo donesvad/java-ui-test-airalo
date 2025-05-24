@@ -1,0 +1,157 @@
+name: Run UI E2E test
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment
+        default: 'test'
+        required: true
+        options:
+          - test
+          - tba
+      tags:
+        type: string
+        description: "Optional Cucumber tags to filter tests (e.g. '@smoke' or '@smoke or @regression'). Leave blank to run all tests."
+        required: false
+        default: ""
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        default: 'test'
+        required: false
+      tags:
+        type: string
+        default: ""
+        required: false
+  push:
+    branches: [ "main" ]
+
+env:
+  DEFAULT_ENVIRONMENT: test
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  selenium-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      selenium-hub:
+        image: selenium/hub:4.28.0
+        ports:
+          - 4444:4444
+        options: >
+          --network-alias=selenium-hub
+          --env SE_SESSION_REQUEST_TIMEOUT=30000
+          --env SE_NODE_SESSION_TIMEOUT=30000
+      chrome:
+        image: selenium/node-chrome:4.28.0
+        options: >
+          --network-alias=chrome
+          --env SE_EVENT_BUS_HOST=selenium-hub
+          --env SE_EVENT_BUS_PUBLISH_PORT=4442
+          --env SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+          --env SE_NODE_MAX_SESSIONS=1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Install Dependencies
+        run: mvn clean install -DskipTests
+
+      - name: Wait for Selenium Hub to be ready
+        run: |
+          timeout=60
+          while [ $timeout -gt 0 ]; do
+            status=$(curl -s http://localhost:4444/status | jq -r '.value.ready')
+            if [ "$status" = "true" ]; then
+              echo "Selenium Hub is ready!"
+              break
+            fi
+            echo "Waiting for Selenium Hub to be ready..."
+            sleep 5
+            timeout=$((timeout - 5))
+          done
+          if [ $timeout -le 0 ]; then
+            echo "Selenium Hub did not become ready in time."
+            exit 1
+          fi
+
+      - name: Determine environment
+        id: determine-environment
+        run: |
+          # If triggered by push, we use the default environment, otherwise use the input
+          if [ "${{ github.event_name }}" == "push" ]; then
+            environment_lowercase=${{ env.DEFAULT_ENVIRONMENT }}
+          else
+            environment_lowercase=$(echo "${{ inputs.environment }}" | tr '[:upper:]' '[:lower:]')
+          fi
+          echo "environment=${environment_lowercase}" >> $GITHUB_ENV
+
+      - name: Determine tags
+        id: determine-tags
+        run: |
+          # If triggered by push, we don't have tags input, so set to empty
+          if [ "${{ github.event_name }}" == "push" ]; then
+            tags_input=""
+          else
+            tags_input="${{ inputs.tags }}"
+          fi
+          echo "tags=${tags_input}" >> $GITHUB_ENV
+
+      - name: Run Selenium Tests
+        run: |
+          echo "Running tests in the '${{ env.environment }}' environment"
+          if [ -z "${{ env.tags }}" ]; then
+            # No tags specified, run all tests
+            mvn test \
+              -Denvironment=${{ env.environment }}
+          else
+            # Run only tests matching the tags
+            echo "Using tags: '${{ env.tags }}'"
+            mvn test \
+              -Denvironment=${{ env.environment }} \
+              -Dcucumber.filter.tags="${{ env.tags }}"
+          fi
+
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: ./logs
+
+      - name: Load test report history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build test report
+        uses: simple-elf/allure-report-action@v1.9
+        if: always()
+        with:
+          gh_pages: gh-pages
+          allure_history: allure-history
+          allure_results: ./allure-results
+
+      - name: Publish test report
+        uses: peaceiris/actions-gh-pages@v4
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
