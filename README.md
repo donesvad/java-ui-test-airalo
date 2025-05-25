@@ -1,6 +1,8 @@
 
 # E2E UI Test Framework
 
+## Disclaimer: This repository is based on the original open-source template repository, primarily adjusted to fit the provided UI Automation Test exercise. You can find the original repository here: donesvad/java-ui-test-github.
+
 This project is an End-to-End (E2E) UI testing framework built with a combination of several powerful tools to ensure robust and reliable testing for web applications. The framework leverages modern testing practices and tools.
 
 ## Tools Used
