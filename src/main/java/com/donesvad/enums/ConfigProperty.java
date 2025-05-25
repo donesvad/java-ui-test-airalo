@@ -6,12 +6,15 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ConfigProperty {
-  BASE_URL("base.url"),
-  BROWSER("browser"),
-  HEADLESS("headless"),
-  SELENIUM_HUB_URL("selenide.remote"),
-  USERNAME("test.username"),
-  PASSWORD("test.password");
+    BASE_URL("base.url"),
+    BROWSER("browser"),
+    HEADLESS("headless"),
+    SELENIUM_HUB_URL("selenide.remote"),
+    TITLE("title"),
+    COVERAGE("coverage"),
+    DATA("data"),
+    VALIDITY("validity"),
+    PRICE("price");
 
-  private final String value;
+    private final String value;
 }

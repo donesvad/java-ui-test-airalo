@@ -33,20 +33,22 @@ This project is an End-to-End (E2E) UI testing framework built with a combinatio
 - Java 11 or higher
 - Maven 3.6+ or higher
 - GitHub account (for CI/CD integration)
+- Selenium Grid setup (optional, for parallel execution)
+- Allure CLI installed (for generating reports)
 
 ### Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/e2e-ui-test-framework.git
-   cd e2e-ui-test-framework
+   git clone https://github.com/donesvad/java-ui-test-airalo.git
+   cd java-ui-test-airalo
    ```
 
 2. Install dependencies using Maven:
 
    ```bash
-   mvn clean install
+   mvn clean install -DskipTests
    ```
 
 ### Configuration
@@ -73,9 +75,9 @@ mvn test
 You can specify which test suite(s) to run by tagging your scenarios in Cucumber. For example:
 
 ```bash
-mvn clean test -Dcucumber.filter.tags="@SmokeTest"
+mvn clean test -Dcucumber.filter.tags="@smoke"
 ```
-This command runs only the tests tagged with `@SmokeTest`.
+This command runs only the tests tagged with `@smoke`.
 
 If you’re using GitHub Actions for CI/CD, you can also specify tags as part of the workflow configuration to filter which tests are executed during the pipeline.
 
@@ -125,5 +127,3 @@ Or follow the [installation instructions](https://allurereport.org/docs/install/
 ### CI/CD Integration
 
 This project is integrated with GitHub Actions for CI/CD. Every push to the repository triggers automated test runs. The results will be available in the GitHub Actions tab.
-
-> **TODO**: Add the ability to choose which browser to use for tests via CI (this feature is already implemented for local execution).
