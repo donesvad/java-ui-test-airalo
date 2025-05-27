@@ -15,7 +15,6 @@ This project is an End-to-End (E2E) UI testing framework built with a combinatio
 - **Allure**: A reporting framework to generate attractive, user-friendly reports for test execution results.
 - **Logback**: A logging framework for outputting logs during the test execution.
 - **Lombok**: A Java library to reduce boilerplate code by auto-generating getters, setters, and other methods.
-- **GitHub Actions**: A CI/CD tool for automating the testing process.
 - **Selenium Grid**: A tool for running tests in parallel across multiple machines and browsers.
 
 ## Features
@@ -25,7 +24,6 @@ This project is an End-to-End (E2E) UI testing framework built with a combinatio
 - **BDD Support**: Integration of Cucumber to write human-readable tests using Gherkin syntax.
 - **Detailed Reporting**: Allure generates detailed and user-friendly reports after test execution.
 - **Centralized Logging**: Logback handles application logs, making it easier to debug and track test execution.
-- **CI/CD Pipeline**: GitHub Actions automates the running of tests with every code change.
 - **Multiple Environment Support**: You can maintain different `.properties` files (e.g., dev, QA, staging) to target various test environments.
 
 ## Getting Started
@@ -91,18 +89,6 @@ The framework is configured to run tests in parallel across multiple browsers us
 
 This project uses **Allure** to generate comprehensive and user-friendly test reports. Allure reports provide detailed insights into test execution, including test results, logs, and visualizations. **Screenshots and `pageSource` files** are also included in the report for any steps that fail, helping with fast and thorough debugging.
 
-#### Viewing the Allure Report
-
-The latest Allure report for this project can be viewed online at the following link:
-
-[View Allure Report Results](https://donesvad.github.io/java-ui-test-github/)
-
-This report includes:
-
-- **Test Results**: Summary and details of passed, failed, and skipped tests
-- **Test Suites**: Breakdown of test suites and their execution results
-- **Test History**: Insights into test execution history and trends over time
-- **Logs and Attachments**: Detailed logs, screenshots, and `pageSource` files for failed steps
 #### How to Generate Allure Report Locally
 
 To generate and view Allure reports locally, follow these steps:
@@ -126,6 +112,11 @@ scoop install allure    # For Windows users using Scoop
 
 Or follow the [installation instructions](https://allurereport.org/docs/install/) from the Allure documentation for other operating systems.
 
-### CI/CD Integration
+#### Viewing the Allure Report
 
-This project is integrated with GitHub Actions for CI/CD. Every push to the repository triggers automated test runs. The results will be available in the GitHub Actions tab.
+This report includes:
+
+- **Test Results**: Summary and details of passed, failed, and skipped tests
+- **Test Suites**: Breakdown of test suites and their execution results
+- **Test History**: Insights into test execution history and trends over time
+- **Logs and Attachments**: Detailed logs, screenshots, and `pageSource` files for failed steps
